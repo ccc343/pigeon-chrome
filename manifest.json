@@ -1,0 +1,12 @@
+{
+  "manifest_version": 2,
+
+  "name": "Pigeon",
+  "version": "1.0",
+  "description": "This is the Pigeon Chrome Extension to help you manage your inbox.",
+
+  "browser_action": {
+    "default_icon": "pigeon.png",
+    "default_popup": "popup.html"
+  }
+}

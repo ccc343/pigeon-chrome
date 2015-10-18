@@ -1,0 +1,19 @@
+body {
+    min-width: 450px;
+}
+
+.title {
+	font-size: 20px;
+	margin: 10px;
+	color: #d45f68;
+	text-transform: uppercase;
+}
+
+.description {
+	font-size: 11px;
+	margin: 10px;
+}
+
+.buttons {
+	margin: 10px;
+}
