@@ -8,5 +8,16 @@
   "browser_action": {
     "default_icon": "pigeon.png",
     "default_popup": "popup.html"
-  }
+  },
+
+  "content_scripts": [{
+  	"matches" : [ "https://mail.google.com/mail*" ],
+  	"js" : ["content.js"]
+  	}],
+
+  "web_accessible_resources": [
+    "jquery-1.10.2.min.js",
+    "gmail.js",
+    "main.js"
+  ]
 }
