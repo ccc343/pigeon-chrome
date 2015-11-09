@@ -19,5 +19,10 @@
     "jquery-1.10.2.min.js",
     "gmail.js",
     "main.js"
+  ],
+
+  "permissions": [
+    "https://pigeonmail.herokuapp.com/*",
+    "http://localhost:5000/*"
   ]
 }
