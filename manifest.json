@@ -16,7 +16,7 @@
   	}],
 
   "web_accessible_resources": [
-    "jquery-1.10.2.min.js",
+    "jquery-2.1.4.js",
     "gmail.js",
     "main.js"
   ],

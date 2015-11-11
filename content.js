@@ -1,5 +1,5 @@
 var j = document.createElement('script');
-j.src = chrome.extension.getURL('jquery-1.10.2.min.js');
+j.src = chrome.extension.getURL('jquery-2.1.4.js');
 (document.head || document.documentElement).appendChild(j);
 
 var g = document.createElement('script');
