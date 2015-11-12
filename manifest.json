@@ -3,7 +3,7 @@
 
   "name": "Pigeon",
   "version": "1.0",
-  "description": "This is the Pigeon Chrome Extension to help you manage your inbox.",
+  "description": "Use Pigeon to manage your organization's email communications.",
 
   "browser_action": {
     "default_icon": "pigeon.png",

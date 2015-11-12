@@ -31,7 +31,7 @@ function main() {
 
 	setInterval(function() {
 		if (document.getElementById('send-pigeon') == null) {
-			gmail.tools.add_toolbar_button(button_html, onSendPigeonClick, 'Custom Style Class');
+			gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'Custom Style Class');
 		}
 	}, 300);
 }
