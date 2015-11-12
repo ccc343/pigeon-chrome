@@ -26,7 +26,7 @@ function refresh(f) {
 function main() {
 	gmail = new Gmail();
 	console.log('Hello,', gmail.get.user_email(), ' Pigeon is ready to use.');
-	var html = '<div class="T-I T-I-KE" role="button" style="color:#d45f68;" id="send-pigeon">'
+	var html = '<div class="T-I T-I-KE" role="button" id="send-pigeon">'
 				+ 'Send Via Pigeon</div>'
 
 	setInterval(function() {
