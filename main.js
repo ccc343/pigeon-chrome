@@ -26,14 +26,20 @@ function refresh(f) {
 function main() {
 	gmail = new Gmail();
 	console.log('Hello,', gmail.get.user_email(), ' Pigeon is ready to use.');
-	var html = '<div class="T-I T-I-KE" role="button" id="send-pigeon">'
-				+ 'Send Via Pigeon</div>'
-
+	// var html = '<div class="T-I T-I-KE" role="button" id="sendPigeon">'
+	// 			+ 'Send Via Pigeon</div>';
+	var html = 'Send Via Pigeon';
+	//gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'send-pigeon');
 	setInterval(function() {
-		if (document.getElementById('send-pigeon') == null) {
-			gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'Custom Style Class');
+		if (document.querySelector('.send-pigeon') == null) {
+			gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'send-pigeon');
 		}
 	}, 300);
+	gmail.observe.on("http_event", function(params) {
+  		if (document.querySelector('.send-pigeon') == null) {
+			gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'send-pigeon');
+		}
+	});
 }
 
 refresh(main);
@@ -112,10 +118,10 @@ function redirectMessage(url, body, data, xhr) {
 		console.log("tags are...", tagNames);
 		// Get the list of emails subscribed to tag
 		if (tagNames.length > 0) {
-			var data = { 'tag': tagNames[0], 'domain': currentDomain};
+			var data = { 'tags': tagNames, 'domain': currentDomain};
 			$.ajax({
 				type: 'POST',
-				url: 'https://pigeonmail.herokuapp.com/get-all-users-tag-org',
+				url: 'https://pigeonmail.herokuapp.com/get-union-users-tag-org',
 				contentType: 'application/json',
 				data: JSON.stringify(data),
 				async: false,

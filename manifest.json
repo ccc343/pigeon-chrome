@@ -11,6 +11,7 @@
   },
 
   "content_scripts": [{
+    "css": [ "css/pigeon.css" ],
   	"matches" : [ "https://mail.google.com/mail*" ],
   	"js" : ["content.js"]
   	}],
