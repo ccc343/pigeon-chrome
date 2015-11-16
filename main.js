@@ -26,14 +26,12 @@ function refresh(f) {
 function main() {
 	gmail = new Gmail();
 	console.log('Hello,', gmail.get.user_email(), ' Pigeon is ready to use.');
-	// var html = '<div class="T-I T-I-KE" role="button" id="sendPigeon">'
-	// 			+ 'Send Via Pigeon</div>';
 	var html = 'Send Via Pigeon';
-	//gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'send-pigeon');
 	setInterval(function() {
 		if ($("[gh='mtb']").find('.send-pigeon').length == 0) {
 			gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'send-pigeon');
 		}
+		$("[gh='mtb']").find('.send-pigeon').show();
 	}, 300);
 }
 
