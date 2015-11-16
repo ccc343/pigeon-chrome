@@ -11,7 +11,7 @@
 	transition: 0.3s;
 }
 
-.send-pigeon:hover, .parse-pigeon:hover{
+.send-pigeon:hover{
 	opacity: 0.9;
 	-webkit-transform: scale(1.1, 1.1);
 	transform: scale(1.1, 1.1);

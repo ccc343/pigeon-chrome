@@ -66,8 +66,12 @@ function onSendPigeonClick() {
 			gmail.tools.add_compose_button(compose_ref, 'Parse My Email', function() {
   				var body = compose.body();
   				console.log(body);
-  				// can then do something with the body
-  				
+  				var textContent = $($.parseHTML(body)).text();
+  				// run textContext through some algorithm to return a list of possible tags, displayed to user.
+  				$.ajax({
+
+  				});
+  				alert(textContext);
 			}, 'parse-pigeon');
 		}
 
