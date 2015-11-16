@@ -1,17 +1,17 @@
-.send-pigeon{
+.send-pigeon, .parse-pigeon{
 	cursor: pointer;
 	background-color: #d45f68;
 	margin-top: 30px;
 	color: white;
 	height: 30px;
-	width: 100px;
+	width: 90px;
 	font-size: 12px;
 	text-align: center;
 	border-radius: 2px;
 	transition: 0.3s;
 }
 
-.send-pigeon:hover {
+.send-pigeon:hover, .parse-pigeon:hover{
 	opacity: 0.9;
 	-webkit-transform: scale(1.1, 1.1);
 	transform: scale(1.1, 1.1);

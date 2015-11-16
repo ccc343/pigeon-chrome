@@ -31,15 +31,10 @@ function main() {
 	var html = 'Send Via Pigeon';
 	//gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'send-pigeon');
 	setInterval(function() {
-		if (document.querySelector('.send-pigeon') == null) {
+		if ($("[gh='mtb']").find('.send-pigeon').length == 0) {
 			gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'send-pigeon');
 		}
 	}, 300);
-	gmail.observe.on("http_event", function(params) {
-  		if (document.querySelector('.send-pigeon') == null) {
-			gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'send-pigeon');
-		}
-	});
 }
 
 refresh(main);
@@ -53,6 +48,8 @@ function onSendPigeonClick() {
 			var validEmailDomain = 'pigeon@' + currentDomain;
 			if (pigeonCompose) {
 				compose.$el.find('textarea[name=to]').val(validEmailDomain);
+				compose.subject('PUT SUBJECT HERE FOLLOWED BY ##tag1 ##tag2');
+
 			} 
 			if (type === 'compose') {
 				activatePigeonSending();
@@ -61,15 +58,20 @@ function onSendPigeonClick() {
 			}
 			pigeonCompose = false;
 		}, 10);
-	});
-}
+		// setInterval(function() {
+		// 	var body = compose.body();
+		// }, 2000);
+		var compose_ref = gmail.dom.composes()[0];
+		if (!compose_ref.find('.gU.Up  > .J-J5-Ji').find('.parse-pigeon').length) {
+			gmail.tools.add_compose_button(compose_ref, 'Parse My Email', function() {
+  				var body = compose.body();
+  				console.log(body);
+  				// can then do something with the body
+  				
+			}, 'parse-pigeon');
+		}
 
-// Returns the query value of name (i.e. ?name=value)
-function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.hash);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	});
 }
 
 // Activate listeners for intercepting right before sending a message
@@ -82,6 +84,7 @@ function activatePigeonSending() {
 		console.log("Before sending message...");
 		redirectMessage(url, body, data, xhr);
 	});
+
 }
 
 // Redirect email to appropriate specified recipient email
@@ -128,7 +131,7 @@ function redirectMessage(url, body, data, xhr) {
 				success: function(data) {
 					// add these emails to the BCC list
 					if (data.length == 0) {
-						alert("No users subscribed to that tag! Resend with correct tags.");
+						alert("No users subscribed to that tag! Resend with tags found at pigeonmail.herokuapp.com");
 					}
 					for (i = 0; i < data.length; i++) {
 						body_params.bcc.push(data[i].email);
