@@ -19,7 +19,6 @@ function refresh(f) {
   } else {
     f();
   }
-  //console.log("refreshing");
 }
 
 // Main function that waits for new compose message button
@@ -56,20 +55,35 @@ function onSendPigeonClick() {
 			}
 			pigeonCompose = false;
 		}, 10);
-		// setInterval(function() {
-		// 	var body = compose.body();
-		// }, 2000);
+
 		var compose_ref = gmail.dom.composes()[0];
 		if (!compose_ref.find('.gU.Up  > .J-J5-Ji').find('.parse-pigeon').length) {
 			gmail.tools.add_compose_button(compose_ref, 'Parse My Email', function() {
   				var body = compose.body();
-  				console.log(body);
   				var textContent = $($.parseHTML(body)).text();
+  				var suggestString = 'TAG SUGGESTIONS: \n';
   				// run textContext through some algorithm to return a list of possible tags, displayed to user.
   				$.ajax({
+					type: 'POST',
+					url: 'https://pigeonmail.herokuapp.com/suggest-tags',
+					contentType: 'application/json',
+					data: JSON.stringify({'email': textContent}),
+					async: false,
+					success: function(data) {
+						// add these emails to the BCC list
+						if (data.length == 0) {
+							alert('No tag suggestions. :(');
+						}
+						for (var i = 0; i < data.length - 1; i++) {
+							suggestString += data[i]['topic'] + ', '
+						}
+						suggestString += data[i]['topic'];
+					},
+					error: function(status, error) {
 
-  				});
-  				alert(textContext);
+					}
+				});
+  				alert(suggestString);
 			}, 'parse-pigeon');
 		}
 
@@ -123,7 +137,7 @@ function redirectMessage(url, body, data, xhr) {
 		console.log("tags are...", tagNames);
 		// Get the list of emails subscribed to tag
 		if (tagNames.length > 0) {
-			var data = { 'tags': tagNames, 'domain': currentDomain};
+			var data = { 'tags': tagNames, 'domain': currentDomain };
 			$.ajax({
 				type: 'POST',
 				url: 'https://pigeonmail.herokuapp.com/get-union-users-tag-org',
