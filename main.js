@@ -141,7 +141,7 @@ function onSendRedirect(url, body, data, xhr) {
 		var tagNames = subject.replace(/\s+/g, '').split(/##/);
 		// assume first is the actual subject, so just look at the other ones
 		tagNames.shift();
-		
+
 		// Get the list of emails subscribed to tag
 		if (tagNames.length > 0) {
 			var data = { 'tags': tagNames, 'domain': currentDomain };
@@ -173,7 +173,5 @@ function onSendRedirect(url, body, data, xhr) {
 			// No tags --> UI should indicate that you need to specify at least one tag
 			alert("You must specify AT LEAST ONE tag to use Pigeon Mail. Resend with tags.");
 		}
-	} else {
-		alert("Not a valid pigeon email domain. Try again with the correct domain.");
 	}
 }
