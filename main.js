@@ -2,44 +2,59 @@
 /* This implements the event listeners and handlers active when a user is on 
 /* his or her gmail page. */
 
+// gmail object
 var gmail;
 // whether the compose window was opened via Pigeon
 var pigeonCompose = false;
 
+// Waits to execute f after the documents and necessary dependencies are loaded
 function refresh(f) {
-  if(/in/.test(document.readyState)) {
-  	//console.log('doc not ready');
-  	setTimeout(function() { refresh(f) }, 10);
-  } else if (typeof jQuery === 'undefined') {
-  	//console.log('jQuery not ready');
-  	setTimeout(function() { refresh(f) }, 10);
-  } else if (undefined === Gmail) {
-  	//console.log('gmail not ready');
+  if(/in/.test(document.readyState) || typeof jQuery === 'undefined' || undefined === Gmail) {
   	setTimeout(function() { refresh(f) }, 10);
   } else {
     f();
   }
 }
 
-// Main function that waits for new compose message button
+// Main function that creates a toolbar button 'Send Via Pigeon' to access Pigeon
+// functionality.
 function main() {
 	gmail = new Gmail();
-	console.log('Hello,', gmail.get.user_email(), ' Pigeon is ready to use.');
 	var html = 'Send Via Pigeon';
+	// Makes sure the toolbar button stays persistently on the page
 	setInterval(function() {
 		if ($("[gh='mtb']").find('.send-pigeon').length == 0) {
-			gmail.tools.add_toolbar_button(html, onSendPigeonClick, 'send-pigeon');
+			gmail.tools.add_toolbar_button(html, onComposePigeonClick, 'send-pigeon');
 		}
-		$("[gh='mtb']").find('.send-pigeon').show();
+		$("[gh='mtb']").find('.send-pigeon').parent().show();
 	}, 300);
 }
 
 refresh(main);
 
-function onSendPigeonClick() {
+/* EVENT LISTENERS */
+// Initiate listeners for intercepting right before sending a message
+function activatePigeonSending() {
+	gmail.observe.off('send_message','before');
+	console.log("I am Pigeon here to help you.");
+	// Before a send_message request gets submitted, change the body to redirect
+	// the email being sent
+	gmail.observe.before('send_message', function(url, body, data, xhr) {
+		onSendRedirect(url, body, data, xhr);
+	});
+
+}
+
+/* EVENT HANDLERS */
+
+// Activated when the 'Send Via Pigeon' toolbar button is clicked. Creates a compose window
+// that is meant to send an email to pigeon@domain, which is redirected to the appropriate set
+// of recipients. Also contains a 'Parse My Email' button that suggests tags to users.
+function onComposePigeonClick() {
 	pigeonCompose = true;
 	gmail.compose.start_compose();
 	gmail.observe.on('compose', function(compose, type) {
+		// Fill in the compose window with Pigeon data
 		setTimeout(function() {
 			var currentDomain = gmail.get.user_email().split('@')[1];
 			var validEmailDomain = 'pigeon@' + currentDomain;
@@ -56,13 +71,16 @@ function onSendPigeonClick() {
 			pigeonCompose = false;
 		}, 10);
 
+		// Add a button to this compose window
 		var compose_ref = gmail.dom.composes()[0];
-		if (!compose_ref.find('.gU.Up  > .J-J5-Ji').find('.parse-pigeon').length) {
+		if (!compose_ref.find('.gU.Up  > .J-J5-Ji').find('.parse-pigeon').length && pigeonCompose) {
+			// This button allows for automatic content tag suggestion.
 			gmail.tools.add_compose_button(compose_ref, 'Parse My Email', function() {
   				var body = compose.body();
   				var textContent = $($.parseHTML(body)).text();
   				var suggestString = 'TAG SUGGESTIONS: \n';
-  				// run textContext through some algorithm to return a list of possible tags, displayed to user.
+
+  				// Get the suggested tags 
   				$.ajax({
 					type: 'POST',
 					url: 'https://pigeonmail.herokuapp.com/suggest-tags',
@@ -86,25 +104,13 @@ function onSendPigeonClick() {
   				alert(suggestString);
 			}, 'parse-pigeon');
 		}
-
 	});
 }
 
-// Activate listeners for intercepting right before sending a message
-function activatePigeonSending() {
-	gmail.observe.off('send_message','before');
-	console.log("I am Pigeon here to help you.");
-	// Before a send_message request gets submitted, change the body to redirect
-	// the email being sent
-	gmail.observe.before('send_message', function(url, body, data, xhr) {
-		console.log("Before sending message...");
-		redirectMessage(url, body, data, xhr);
-	});
 
-}
-
-// Redirect email to appropriate specified recipient email
-function redirectMessage(url, body, data, xhr) {
+// Activated when 'Send' is pressed from the compose window.
+// Redirects email to appropriate set of recipients based on tag subscriptions
+function onSendRedirect(url, body, data, xhr) {
 	var body_params = xhr.xhrParams.body_params;
 	console.log(body_params);
 	var subject = body_params.subject;
@@ -112,6 +118,7 @@ function redirectMessage(url, body, data, xhr) {
 	var currentDomain = gmail.get.user_email().split('@')[1];
 	var validEmailDomain = 'pigeon@' + currentDomain;
 
+	// Check the validity of the 'TO' field
 	if (data.to[0] == validEmailDomain) {
 		console.log("Redirecting message...");
 		if (body_params.bcc) {
@@ -119,7 +126,6 @@ function redirectMessage(url, body, data, xhr) {
 		} else {
 			body_params.bcc = [];
 		}
-		// Parse the content of the subject to find the tag, denoted by ##tag
 
 		// check whether there's a subject
 		var noSubject = true;
@@ -130,11 +136,12 @@ function redirectMessage(url, body, data, xhr) {
 				noSubject = false;
 			}
 		}
-		
+
+		// Parse the content of the subject to find the tag, denoted by ##tag
 		var tagNames = subject.replace(/\s+/g, '').split(/##/);
 		// assume first is the actual subject, so just look at the other ones
 		tagNames.shift();
-		console.log("tags are...", tagNames);
+		
 		// Get the list of emails subscribed to tag
 		if (tagNames.length > 0) {
 			var data = { 'tags': tagNames, 'domain': currentDomain };
@@ -166,5 +173,7 @@ function redirectMessage(url, body, data, xhr) {
 			// No tags --> UI should indicate that you need to specify at least one tag
 			alert("You must specify AT LEAST ONE tag to use Pigeon Mail. Resend with tags.");
 		}
-	} 
+	} else {
+		alert("Not a valid pigeon email domain. Try again with the correct domain.");
+	}
 }
