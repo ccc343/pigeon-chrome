@@ -75,7 +75,7 @@ function onComposePigeonClick() {
 		var compose_ref = gmail.dom.composes()[0];
 		if (!compose_ref.find('.gU.Up  > .J-J5-Ji').find('.parse-pigeon').length && pigeonCompose) {
 			// This button allows for automatic content tag suggestion.
-			gmail.tools.add_compose_button(compose_ref, 'Parse My Email', function() {
+			gmail.tools.add_compose_button(compose_ref, 'Suggest Tags', function() {
   				var body = compose.body();
   				var textContent = $($.parseHTML(body)).text();
   				var suggestString = 'TAG SUGGESTIONS: \n';
