@@ -16,8 +16,9 @@ A mailing list solution for organizations - compatible with Gmail only.
 2. You should see a "Send Via Pigeon" button - Click on it.
 3. The compose window should already contain pigeon@domain in the "to" field.
 4. Write your email, but also append "##tag1 ##tag2" to the subject line after your normal subject.
-5. Send your email.
-6. If there are errors, you will be alerted. The email will still send to "pigeon@domain", but that's OK (for now).
+5. Click 'Suggest Tags' to have Pigeon parse your email and automatically suggest you a list of Pigeon-approved tags you can append to your subject line.
+6. Send your email.
+7. If there are errors, you will be alerted. The email will still send to "pigeon@domain", but that's OK (for now).
 
 ## Example:
 
