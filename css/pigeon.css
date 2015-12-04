@@ -16,3 +16,11 @@
 	-webkit-transform: scale(1.1, 1.1);
 	transform: scale(1.1, 1.1);
 }
+
+.parse-pigeon:hover {
+	background-image: -webkit-linear-gradient(top, #d45f68, #ce4a54);
+}
+
+.parse-pigeon:active {
+	background-image: -webkit-linear-gradient(top, #ce4a54, #d45f68);
+}

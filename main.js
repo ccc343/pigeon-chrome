@@ -76,32 +76,38 @@ function onComposePigeonClick() {
 		if (!compose_ref.find('.gU.Up  > .J-J5-Ji').find('.parse-pigeon').length && pigeonCompose) {
 			// This button allows for automatic content tag suggestion.
 			gmail.tools.add_compose_button(compose_ref, 'Suggest Tags', function() {
-  				var body = compose.body();
-  				var textContent = $($.parseHTML(body)).text();
-  				var suggestString = 'TAG SUGGESTIONS: \n';
-
   				// Get the suggested tags 
   				$.ajax({
 					type: 'POST',
 					url: 'https://pigeonmail.herokuapp.com/suggest-tags',
 					contentType: 'application/json',
-					data: JSON.stringify({'email': textContent}),
-					async: false,
+					beforeSend: function(xhr, settings) {
+						$('.parse-pigeon').click(false);
+						$('.parse-pigeon').text('Loading...');
+  						var body = compose.body();
+  						var textContent = $($.parseHTML(body)).text();
+  						settings.data = JSON.stringify({'email': textContent});
+					},
 					success: function(data) {
+						var suggestString = 'TAG SUGGESTIONS: \n';
 						// add these emails to the BCC list
-						if (data.length == 0) {
-							alert('No tag suggestions. :(');
+						if (data.length == 0 || data == null) {
+							suggestString += "None. :(";
+						} else {
+							for (var i = 0; i < data.length - 1; i++) {
+								suggestString += data[i]['tag'] + ', '
+							}
+							suggestString += data[i]['tag'];
 						}
-						for (var i = 0; i < data.length - 1; i++) {
-							suggestString += data[i]['topic'] + ', '
-						}
-						suggestString += data[i]['topic'];
+						alert(suggestString);
+  						$('.parse-pigeon').text('Suggest Tags');
 					},
 					error: function(status, error) {
-
+						var suggestString = 'TAG SUGGESTIONS: None :(';
+						alert(suggestString);
+  						$('.parse-pigeon').text('Suggest Tags');
 					}
 				});
-  				alert(suggestString);
 			}, 'parse-pigeon');
 		}
 	});
