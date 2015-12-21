@@ -51,66 +51,89 @@ function activatePigeonSending() {
 // that is meant to send an email to pigeon@domain, which is redirected to the appropriate set
 // of recipients. Also contains a 'Parse My Email' button that suggests tags to users.
 function onComposePigeonClick() {
-	pigeonCompose = true;
-	gmail.compose.start_compose();
-	gmail.observe.on('compose', function(compose, type) {
-		// Fill in the compose window with Pigeon data
-		setTimeout(function() {
-			var currentDomain = gmail.get.user_email().split('@')[1];
-			var validEmailDomain = 'pigeon@' + currentDomain;
-			if (pigeonCompose) {
-				compose.$el.find('textarea[name=to]').val(validEmailDomain);
-				compose.subject('PUT SUBJECT HERE FOLLOWED BY ##tag1 ##tag2');
-
-			} 
-			if (type === 'compose') {
-				activatePigeonSending();
+	// First, make sure this domain is on Pigeon.
+	var currentDomain = gmail.get.user_email().split('@')[1];
+	$.ajax({
+		type: 'POST',
+		url: 'https://pigeonmail.herokuapp.com/domain-exists',
+		contentType: 'application/json',
+		data: JSON.stringify({'orgDomain': currentDomain}),
+		async: false,
+		success: function(data) {
+			if (data[0].count == 0) {
+				alert("You cannot access Pigeon from this email domain. Try with another organization Gmail account.");
+				pigeonAllowed = false;
 			} else {
-				gmail.observe.off('send_message', 'before');
+				pigeonAllowed = true;
 			}
-			pigeonCompose = false;
-		}, 10);
-
-		// Add a button to this compose window
-		var compose_ref = gmail.dom.composes()[0];
-		if (!compose_ref.find('.gU.Up  > .J-J5-Ji').find('.parse-pigeon').length && pigeonCompose) {
-			// This button allows for automatic content tag suggestion.
-			gmail.tools.add_compose_button(compose_ref, 'Suggest Tags', function() {
-  				// Get the suggested tags 
-  				$.ajax({
-					type: 'POST',
-					url: 'https://pigeonmail.herokuapp.com/suggest-tags',
-					contentType: 'application/json',
-					beforeSend: function(xhr, settings) {
-						$('.parse-pigeon').click(false);
-						$('.parse-pigeon').text('Loading...');
-  						var body = compose.body();
-  						var textContent = $($.parseHTML(body)).text();
-  						settings.data = JSON.stringify({'email': textContent});
-					},
-					success: function(data) {
-						var suggestString = 'TAG SUGGESTIONS: \n';
-						// add these emails to the BCC list
-						if (data.length == 0 || data == null) {
-							suggestString += "None. :(";
-						} else {
-							for (var i = 0; i < data.length - 1; i++) {
-								suggestString += data[i]['tag'] + ', '
-							}
-							suggestString += data[i]['tag'];
-						}
-						alert(suggestString);
-  						$('.parse-pigeon').text('Suggest Tags');
-					},
-					error: function(status, error) {
-						var suggestString = 'TAG SUGGESTIONS: None :(';
-						alert(suggestString);
-  						$('.parse-pigeon').text('Suggest Tags');
-					}
-				});
-			}, 'parse-pigeon');
 		}
 	});
+
+	// Only activate Pigeon specific listeners if pigeon is allowed.
+	if (pigeonAllowed) {
+		pigeonCompose = true;
+		gmail.compose.start_compose();
+		gmail.observe.on('compose', function(compose, type) {
+			// Fill in the compose window with Pigeon data
+			setTimeout(function() {
+				var currentDomain = gmail.get.user_email().split('@')[1];
+				var validEmailDomain = 'pigeon@' + currentDomain;
+				if (pigeonCompose) {
+					compose.$el.find('textarea[name=to]').val(validEmailDomain);
+					compose.subject('PUT SUBJECT HERE FOLLOWED BY ##tag1 ##tag2');
+				} 
+				if (type === 'compose') {
+					activatePigeonSending();
+				} else {
+					gmail.observe.off('send_message', 'before');
+				}
+				pigeonCompose = false;
+			}, 10);
+
+			// Add a button to this compose window
+			var compose_ref = gmail.dom.composes()[0];
+			if (!compose_ref.find('.gU.Up  > .J-J5-Ji').find('.parse-pigeon').length && pigeonCompose) {
+				// This button allows for automatic content tag suggestion.
+				gmail.tools.add_compose_button(compose_ref, 'Suggest Tags', function() {
+	  				// Get the suggested tags 
+	  				$.ajax({
+						type: 'POST',
+						url: 'https://pigeonmail.herokuapp.com/suggest-tags',
+						contentType: 'application/json',
+						beforeSend: function(xhr, settings) {
+							$('.parse-pigeon').click(false);
+							$('.parse-pigeon').text('Loading...');
+	  						var body = compose.body();
+	  						var textContent = $($.parseHTML(body)).text();
+	  						settings.data = JSON.stringify({'email': textContent});
+						},
+						success: function(data) {
+							var suggestString = 'TAG SUGGESTIONS: \n';
+							var listOfTags = '';
+							// add these emails to the BCC list
+							if (data.length == 0 || data == null) {
+								listOfTags += "None. :(";
+							} else {
+								for (var i = 0; i < data.length; i++) {
+									listOfTags += '##' + data[i]['tag'] + ' ';
+								}
+							}
+							suggestString += listOfTags;
+							alert(suggestString);
+							// Change the subject to add these suggested tags.
+							compose.subject(compose.subject() + ' ' + listOfTags);
+	  						$('.parse-pigeon').text('Suggest Tags');
+						},
+						error: function(status, error) {
+							var suggestString = 'TAG SUGGESTIONS: None :(';
+							alert(suggestString);
+	  						$('.parse-pigeon').text('Suggest Tags');
+						}
+					});
+				}, 'parse-pigeon');
+			}
+		});
+	}
 }
 
 
