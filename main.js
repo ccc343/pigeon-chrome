@@ -105,27 +105,27 @@ function onComposePigeonClick() {
 							$('.parse-pigeon').text('Loading...');
 	  						var body = compose.body();
 	  						var textContent = $($.parseHTML(body)).text();
-	  						settings.data = JSON.stringify({'email': textContent});
+	  						settings.data = JSON.stringify({'email': textContent, 'domain': currentDomain});
 						},
 						success: function(data) {
 							var suggestString = 'TAG SUGGESTIONS: \n';
 							var listOfTags = '';
 							// add these emails to the BCC list
 							if (data.length == 0 || data == null) {
-								listOfTags += "None. :(";
+								alert(suggestString += "None :( Sorry.");
 							} else {
 								for (var i = 0; i < data.length; i++) {
 									listOfTags += '##' + data[i]['tag'] + ' ';
 								}
+								suggestString += listOfTags;
+								alert(suggestString);
+								// Change the subject to add these suggested tags.
+								compose.subject(compose.subject() + ' ' + listOfTags);
 							}
-							suggestString += listOfTags;
-							alert(suggestString);
-							// Change the subject to add these suggested tags.
-							compose.subject(compose.subject() + ' ' + listOfTags);
-	  						$('.parse-pigeon').text('Suggest Tags');
+							$('.parse-pigeon').text('Suggest Tags');
 						},
 						error: function(status, error) {
-							var suggestString = 'TAG SUGGESTIONS: None :(';
+							var suggestString = 'TAG SUGGESTIONS: \n None :( Sorry.';
 							alert(suggestString);
 	  						$('.parse-pigeon').text('Suggest Tags');
 						}
