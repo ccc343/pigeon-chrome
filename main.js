@@ -66,6 +66,9 @@ function onComposePigeonClick() {
 			} else {
 				pigeonAllowed = true;
 			}
+		},
+		error: function(status, error) {
+			pigeonAllowed = false;
 		}
 	});
 
